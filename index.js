@@ -64,10 +64,14 @@ function setupHeadFeeder() {
       let shortHash = hash.substr(0, 8)
       const { data: result } = await github.searchIssue(remote, { hash })
 
+      let issueNo = null
       if (result.total_count === 0) {
         let body = `本家のドキュメントに更新がありました:page_facing_up:\r\nOriginal:${item.link}`
         const { data: newIssue } = await github.createIssue(remote, { title: `[Doc]: ${item.title}`, body, labels: ['documentation'] })
+        issueNo = newIssue.number
         Utility.log('S', `Issue created: ${newIssue.html_url}`)
+      } else {
+        issueNo = result.items[0].number
       }
 
       if (repo.existsRemoteBranch(shortHash)) {
@@ -85,7 +89,7 @@ function setupHeadFeeder() {
       } else {
         Utility.log('S', `Fully merged: ${shortHash}`)
         repo.updateRemote(shortHash)
-        await after(item, hash, shortHash)
+        await after(item, shortHash, issueNo)
       }
     }
   })
@@ -111,8 +115,9 @@ function removeHeadFeeder() {
   headFeeder.destroy()
 }
 
-async function after(item, hash, shortHash) {
-  const { data: pullRequest } = await github.createPullRequest(remote, { title: item.title, body: `Cherry picked from ${item.link}`, branch: shortHash })
+async function after(item, shortHash, issueNo = null) {
+  const body = issueNo ? `This resolves #${issueNo}\r\nCherry picked from ${item.link}` : `Cherry picked from ${item.link}`
+  const { data: pullRequest } = await github.createPullRequest(remote, { title: item.title, body, branch: shortHash })
   if (!pullRequest) return
   Utility.log('S', `Created new pull request: ${pullRequest.html_url}`)
   await github.assignReviewers(remote, { number: pullRequest.number, reviewers: ['re-fort', 'kazupon'] })
