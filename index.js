@@ -117,17 +117,6 @@ async function after(item, hash, shortHash) {
   Utility.log('S', `Created new pull request: ${pullRequest.html_url}`)
   await github.assignReviewers(remote, { number: pullRequest.number, reviewers: ['re-fort', 'kazupon'] })
   Utility.log('S', 'Assigned reviewers')
-
-  const { messages } = await slack.searchMessages({ query: hash })
-  if (!messages) return
-  let message = messages.matches.find(extractMatchedMessage)
-  if (!message) return
-  const { ok: result } = await slack.addReactions({ name: 'raising_hand', channel: process.env.SLACK_CHANNEL, timestamp: message.ts })
-  if (result) Utility.log('S', `Add reaction: ${message.permalink}`)
-}
-
-function extractMatchedMessage(message) {
-  return message.text !== '' && message.channel.id === process.env.SLACK_CHANNEL && message.username === 'recent commits to vuejs.org:master'
 }
 
 process.on('unhandledRejection', err => { Utility.log('E', err) })
