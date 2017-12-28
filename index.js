@@ -67,7 +67,7 @@ function setupHeadFeeder() {
       let issueNo = null
       if (result.total_count === 0) {
         let body = `本家のドキュメントに更新がありました:page_facing_up:\r\nOriginal:${item.link}`
-        const { data: newIssue } = await github.createIssue(remote, { title: `[Doc]: ${item.title}`, body, labels: ['documentation'] })
+        const { data: newIssue } = await github.createIssue(remote, { title: `[Doc]: ${Utility.removeHash(item.title)}`, body, labels: ['documentation'] })
         issueNo = newIssue.number
         Utility.log('S', `Issue created: ${newIssue.html_url}`)
       } else {
@@ -117,7 +117,7 @@ function removeHeadFeeder() {
 
 async function after(item, shortHash, issueNo = null) {
   const body = issueNo ? `This PR resolves #${issueNo}\r\nCherry picked from ${item.link}` : `Cherry picked from ${item.link}`
-  const { data: pullRequest } = await github.createPullRequest(remote, { title: item.title, body, branch: shortHash })
+  const { data: pullRequest } = await github.createPullRequest(remote, { title: Utility.removeHash(item.title), body, branch: shortHash })
   if (!pullRequest) return
   Utility.log('S', `Created new pull request: ${pullRequest.html_url}`)
   await github.assignReviewers(remote, { number: pullRequest.number, reviewers: ['re-fort', 'kazupon'] })
