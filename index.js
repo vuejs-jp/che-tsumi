@@ -1,13 +1,13 @@
 const RssFeedEmitter = require('rss-feed-emitter')
 const Github = require('./lib/github')
 const Repo = require('./lib/repository')
-const Slack = require('./lib/slack')
+// const Slack = require('./lib/slack')
 const Utility = require('./lib/utility')
 
 let upstreamFeeder = new RssFeedEmitter()
 let headFeeder = new RssFeedEmitter()
 let github = new Github()
-let slack = new Slack({ token: process.env.SLACK_TOKEN })
+// let slack = new Slack({ token: process.env.SLACK_TOKEN })
 
 let startUpTime = new Date().toISOString()
 
