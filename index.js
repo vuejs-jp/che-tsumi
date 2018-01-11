@@ -56,14 +56,19 @@ const setupHeadFeeder = () => {
     refresh: Number(process.env.HEAD_FEED_REFRESH),
   })
 
-  headFeeder.on('new-item', async function(item) {
+  headFeeder.on('new-item', async (item) => {
     Utility.log('I', `New commit on head repo: ${item.title}`)
 
-    let hash = Utility.extractBasename(item.link)
+    const hash = Utility.extractBasename(item.link)
     // branch names consisting of 40 hex characters are not allowed
-    let shortHash = hash.substr(0, 8)
-    const { data: result } = await github.searchIssue(remote, { hash })
+    const shortHash = hash.substr(0, 8)
 
+    if (repo.existsRemoteBranch(shortHash)) {
+      Utility.log('W', `Remote branch already exists: ${shortHash}`)
+      return
+    }
+
+    const { data: result } = await github.searchIssue(remote, { hash })
     let issueNo = null
     if (result.total_count === 0) {
       let body = `本家のドキュメントに更新がありました:page_facing_up:\r\nOriginal:${item.link}`
@@ -72,11 +77,6 @@ const setupHeadFeeder = () => {
       Utility.log('S', `Issue created: ${newIssue.html_url}`)
     } else {
       issueNo = result.items[0].number
-    }
-
-    if (repo.existsRemoteBranch(shortHash)) {
-      Utility.log('W', `Remote branch already exists: ${shortHash}`)
-      return
     }
 
     repo.fetchAllRemotes()
@@ -100,7 +100,7 @@ const setupUpstreamFeeder = () => {
     refresh: Number(process.env.UPSTREAM_FEED_REFRESH),
   })
 
-  upstreamFeeder.on('new-item', function(item) {
+  upstreamFeeder.on('new-item', (item) => {
     if (startUpTime < item.date.toISOString()) {
       Utility.log('I', `New commit on upstream repo: ${item.title}`)
       removeHeadFeeder()
