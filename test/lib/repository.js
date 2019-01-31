@@ -4,8 +4,8 @@ const Repo = require('../../lib/repository')
 
 describe('Repository', function () {
   let origin = {
-    url: 'git@github.com:re-fort/che-tsumi.git',
-    owner: 're-fort',
+    url: 'git@github.com:vuejs-jp/che-tsumi.git',
+    owner: 'vuejs-jp',
     name: 'che-tsumi',
     defaultBranch: 'master',
   }
