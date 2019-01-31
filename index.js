@@ -2,9 +2,11 @@ const RssFeedEmitter = require('rss-feed-emitter')
 const Queue = require('queue')
 const Github = require('./lib/github')
 const Repo = require('./lib/repository')
+const I18n = require('./lib/i18n')
 // const Slack = require('./lib/slack')
 const Utility = require('./lib/utility')
 
+let i18n = new I18n()
 let upstreamFeeder = new RssFeedEmitter()
 let headFeeder = new RssFeedEmitter()
 let github = new Github()
@@ -73,7 +75,7 @@ const setupHeadFeeder = () => {
     const { data: result } = await github.searchIssue(remote, { hash })
     let issueNo = null
     if (result.total_count === 0) {
-      let body = `本家のドキュメントに更新がありました:page_facing_up:\r\nOriginal:${item.link}`
+      let body = `${i18n._t('body')} :page_facing_up:\r\nOriginal:${item.link}`
       const { data: newIssue } = await github.createIssue(remote, { title: `[Doc]: ${Utility.removeHash(item.title)}`, body, labels: ['documentation'] })
       issueNo = newIssue.number
       Utility.log('S', `${item.title}: Issue created: ${newIssue.html_url}`)
