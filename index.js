@@ -139,6 +139,8 @@ const after = async (item, shortHash, issueNo = null) => {
   Utility.log('S', `Created new pull request: ${pullRequest.html_url}`)
   await github.assignReviewers(remote, { number: pullRequest.number, reviewers: ['re-fort', 'kazupon', 'potato4d'] })
   Utility.log('S', 'Assigned reviewers')
+  await github.addLabels(remote, { number: issueNo, labels: ['assigned'] })
+  Utility.log('S', 'Added "assigned" label to issue')
 }
 
 process.on('unhandledRejection', err => { Utility.log('E', err) })
