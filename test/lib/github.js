@@ -42,6 +42,15 @@ describe('Github', function () {
         assert(closedIssue.state === 'closed')
       })
     })
+
+    describe('createLabels()', function () {
+      it('creates new label', async function () {
+        const { data: newIssue } = await github.createIssue(remote, { title: 'Test', body: `Test\r\nOriginal:${url}`, labels: ['documentation'] })
+
+        const { data: result } = await github.addLabels(remote, { number: newIssue.number, labels: ['invalid'] })
+        assert(result.length === 2)
+      })
+    })
   })
 
   describe('pullRequest', function () {
