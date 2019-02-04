@@ -45,6 +45,8 @@ let repo = new Repo(
   }
 )
 
+let reviewers = process.env.REVIEWERS.split(',') || 're-fort,kazupon,potato4d'
+
 const setup = () => {
   repo.setup()
   github.authenticate({ type: 'token', token: process.env.GITHUB_ACCESS_TOKEN })
@@ -137,7 +139,7 @@ const after = async (item, shortHash, issueNo = null) => {
   const { data: pullRequest } = await github.createPullRequest(remote, { title: Utility.removeHash(item.title), body, branch: shortHash })
   if (!pullRequest) return
   Utility.log('S', `Created new pull request: ${pullRequest.html_url}`)
-  await github.assignReviewers(remote, { number: pullRequest.number, reviewers: ['re-fort', 'kazupon', 'potato4d'] })
+  await github.assignReviewers(remote, { number: pullRequest.number, reviewers: reviewers })
   Utility.log('S', 'Assigned reviewers')
   await github.addLabels(remote, { number: issueNo, labels: ['assigned'] })
   Utility.log('S', 'Added "assigned" label to issue')
