@@ -18,7 +18,7 @@
     "queue": "^4.4.2",
     "request-promise": "^4.2.1",
     "rss-feed-emitter": "^1.0.7",
-    "shelljs": "^0.7.8"
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "eslint": "^4.7.2",
